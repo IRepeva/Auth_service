@@ -1,9 +1,8 @@
 import uuid
 from datetime import datetime
-from typing import Optional
 
 import bcrypt
-from sqlalchemy import ForeignKey, UniqueConstraint, or_
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
 from databases import db
@@ -40,14 +39,14 @@ class User(db.Model):
 
     def get_user_roles(self):
         return db.session.query(
-                Role
-            ).join(
-                UserRole,
-                UserRole.role == Role.id
-            ).join(
-                User,
-                UserRole.user == self.id
-            ).all()
+            Role
+        ).join(
+            UserRole,
+            UserRole.role == Role.id
+        ).join(
+            User,
+            UserRole.user == self.id
+        ).all()
 
     def update_user_roles(self, role_ids: list):
         role_ids = set(role_ids)
@@ -74,6 +73,16 @@ class User(db.Model):
 
 class LoginHistory(db.Model):
     __tablename__ = 'login_history'
+    __table_args__ = (
+        UniqueConstraint('id', 'device_type'),
+        {'postgresql_partition_by': 'LIST (device_type)'}
+    )
+    DEVICE_TYPES = {
+        'mobile': 'mobile',
+        'pc': 'pc',
+        'tablet': 'tablet',
+        'other': 'other'
+    }
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user = db.Column(
@@ -81,8 +90,9 @@ class LoginHistory(db.Model):
         ForeignKey(User.id, ondelete="CASCADE"),
         nullable=False
     )
+    login_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user_agent = db.Column(db.String, nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    device_type = db.Column(db.String, primary_key=True)
 
 
 class Role(db.Model):
@@ -93,14 +103,14 @@ class Role(db.Model):
 
     def get_role_users(self):
         return db.session.query(
-                User
-            ).join(
-                UserRole,
-                UserRole.user == User.id
-            ).join(
-                Role,
-                UserRole.role == self.id
-            ).all()
+            User
+        ).join(
+            UserRole,
+            UserRole.user == User.id
+        ).join(
+            Role,
+            UserRole.role == self.id
+        ).all()
 
 
 class UserRole(db.Model):

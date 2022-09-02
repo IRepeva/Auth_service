@@ -24,6 +24,17 @@ DEFAULT_PAGE_SIZE = 50
 tag = 'user'
 
 
+def get_device_type(user_agent):
+    match user_agent:
+        case user_agent.is_mobile:
+            return LoginHistory.DEVICE_TYPES['mobile']
+        case user_agent.is_pc:
+            return LoginHistory.DEVICE_TYPES['pc']
+        case user_agent.is_tablet:
+            return LoginHistory.DEVICE_TYPES['tablet']
+    return LoginHistory.DEVICE_TYPES['other']
+
+
 @registry.handles(
     rule=f'{URL_USER_PREFIX}/register',
     method='POST',
@@ -64,10 +75,12 @@ def login():
 
     response = get_new_jwt_tokens(user)
 
-    user_agent = str(parse(request.headers['User-Agent']))
+    user_agent = parse(request.headers['User-Agent'])
+    device_type = get_device_type(user_agent)
     user_history = LoginHistory(
         user=user.id,
-        user_agent=user_agent
+        user_agent=str(user_agent),
+        device_type=device_type
     )
     db.session.add(user_history)
     db.session.commit()
