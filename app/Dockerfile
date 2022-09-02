@@ -11,7 +11,7 @@ RUN pip install --upgrade pip &&  \
     useradd -d /app -r -g app_group app_user
 
 COPY --chown=app_user:app_group ./requirements requirements
-RUN pip install -r requirements/base.txt --no-cache-dir
+RUN pip install -r requirements/app.txt --no-cache-dir
 
 COPY --chown=app_user:app_group ./app .
 

@@ -11,7 +11,7 @@ ACCESS_TOKEN_EXPIRE = jwt_settings.JWT_ACCESS_TOKEN_EXPIRES
 REFRESH_TOKEN_EXPIRE = jwt_settings.JWT_REFRESH_TOKEN_EXPIRES
 
 
-def init_db(app: Flask):
+def configure_db(app: Flask):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = db_settings.SQLALCHEMY_DATABASE_URI
 

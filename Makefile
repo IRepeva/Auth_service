@@ -10,7 +10,7 @@ init_db:
 
 db_upgrade:
 	@echo "Database initialization is started"
-	@${docker_flask_db} upgrade
+	@${docker_flask} db upgrade
 	@echo "Database initialization is finished"
 
 .PHONY = create_superuser check-env
@@ -37,14 +37,13 @@ run_tests:
 run_app:
 	@echo "Starting applications"
 	@docker-compose up -d --build
-	@echo "Auth is up"
+	@echo "Applications are up"
 
 run_sample_app:
 	@echo "Starting applications"
 	@docker-compose --env-file .env.sample up -d --build
-	@echo "Auth is up"
+	@echo "Applications are up"
 
 down:
-	@echo "Running tests"
 	@docker-compose down --remove-orphans
-	@echo "Tests finished"
+	@echo "Applications are down"
