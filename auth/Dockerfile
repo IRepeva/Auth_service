@@ -22,7 +22,7 @@ FROM base AS tests
 
 WORKDIR /auth
 
-COPY --from=base --chown=auth_user:auth_group /auth ./api
+COPY --from=base --chown=auth_user:auth_group /auth ./auth
 
 RUN pip install -r requirements/tests.txt --no-cache-dir
 

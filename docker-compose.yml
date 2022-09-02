@@ -15,14 +15,16 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXP_ACCESS: ${JWT_EXP_ACCESS}
       JWT_EXP_REFRESH: ${JWT_EXP_REFRESH}
+      JAEGER_AGENT_HOST: ${JAEGER_AGENT_HOST}
+      JAEGER_AGENT_PORT: ${JAEGER_AGENT_PORT}
     volumes:
       - ./auth/migrations:/auth/migrations
     depends_on:
       - redis
       - postgres
 
-  api:
-    container_name: api
+  app:
+    container_name: app
     build:
       context: .
       dockerfile: app/Dockerfile
@@ -70,5 +72,12 @@ services:
     ports:
       - '80:80'
     depends_on:
-      - api
+      - app
       - auth
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.37
+    container_name: jaeger
+    ports:
+      - '6831:6831/udp'
+      - '16686:16686'

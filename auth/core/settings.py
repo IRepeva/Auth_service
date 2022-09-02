@@ -1,12 +1,12 @@
 from functools import lru_cache
 from logging import config as logging_config
 
-# LOGGING
-from core.logger import LOGGING
 from pydantic import BaseSettings, Field
 
-logging_config.dictConfig(LOGGING)
+# LOGGING
+from core.logger import LOGGING
 
+logging_config.dictConfig(LOGGING)
 
 BASE_CONFIG = 'core.settings.jwt_settings'
 TEST_CONFIG = 'core.settings.test_settings'
@@ -32,6 +32,12 @@ class JWTSettings(BaseSettings):
     JWT_REFRESH_COOKIE_PATH = '/user/'
     JWT_COOKIE_CSRF_PROTECT = False
     JWT_TOKEN_LOCATION = ['headers', 'cookies']
+
+
+class AdditionalSettings(BaseSettings):
+    # Jaeger
+    JAEGER_AGENT_HOST: str = Field('localhost', env='JAEGER_AGENT_HOST')
+    JAEGER_AGENT_PORT: int = Field(6831, env='JAEGER_AGENT_PORT')
 
 
 class TestSettings(BaseSettings):
@@ -65,10 +71,16 @@ def get_jwt_settings() -> JWTSettings:
 
 
 @lru_cache
+def get_additional_settings() -> AdditionalSettings:
+    return AdditionalSettings()
+
+
+@lru_cache
 def get_test_settings() -> TestSettings:
     return TestSettings()
 
 
 db_settings = get_db_settings()
 jwt_settings = get_jwt_settings()
+additional_settings = get_additional_settings()
 test_settings = get_test_settings()
