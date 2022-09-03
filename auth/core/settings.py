@@ -34,6 +34,11 @@ class JWTSettings(BaseSettings):
     JWT_TOKEN_LOCATION = ['headers', 'cookies']
 
 
+class OAuthSettings(BaseSettings):
+    CLIENT_ID: str = Field(env='CLIENT_ID')
+    CLIENT_SECRET: str = Field(env='CLIENT_SECRET')
+
+
 class AdditionalSettings(BaseSettings):
     # Jaeger
     JAEGER_AGENT_HOST: str = Field('localhost', env='JAEGER_AGENT_HOST')
@@ -71,6 +76,11 @@ def get_jwt_settings() -> JWTSettings:
 
 
 @lru_cache
+def get_oauth_settings() -> OAuthSettings:
+    return OAuthSettings()
+
+
+@lru_cache
 def get_additional_settings() -> AdditionalSettings:
     return AdditionalSettings()
 
@@ -82,5 +92,6 @@ def get_test_settings() -> TestSettings:
 
 db_settings = get_db_settings()
 jwt_settings = get_jwt_settings()
+oauth_settings = get_oauth_settings()
 additional_settings = get_additional_settings()
 test_settings = get_test_settings()
