@@ -18,6 +18,7 @@ from extensions import migrate, jwt, ma, bcrypt, rebar
 from databases import db, configure_db
 from api.v1.admin_api import admin_blueprint
 from api.v1.user_api import user_blueprint
+from api.v1.oauth_api import oauth_blueprint
 from api import models
 
 
@@ -49,6 +50,7 @@ def add_commands(app):
 def register_blueprints(app: Flask):
     app.register_blueprint(user_blueprint)
     app.register_blueprint(admin_blueprint)
+    app.register_blueprint(oauth_blueprint)
 
 
 def configure_tracer(app) -> None:

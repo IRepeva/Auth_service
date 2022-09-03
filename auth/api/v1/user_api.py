@@ -11,6 +11,7 @@ from api.models import User, LoginHistory
 from api.v1.schemas.user_api import (
     user_login_schema, user_profile_schema, login_history_schema
 )
+from api.v1.utils.other import get_device_type
 from api.v1.utils.tokens import get_new_jwt_tokens, add_tokens_to_blocklist
 from databases import db
 from extensions import rebar
@@ -24,15 +25,29 @@ DEFAULT_PAGE_SIZE = 50
 tag = 'user'
 
 
-def get_device_type(user_agent):
-    match user_agent:
-        case user_agent.is_mobile:
-            return LoginHistory.DEVICE_TYPES['mobile']
-        case user_agent.is_pc:
-            return LoginHistory.DEVICE_TYPES['pc']
-        case user_agent.is_tablet:
-            return LoginHistory.DEVICE_TYPES['tablet']
-    return LoginHistory.DEVICE_TYPES['other']
+def login_user(user, user_agent):
+    user_agent = parse(user_agent)
+    device_type = get_device_type(user_agent)
+    user_history = LoginHistory(
+        user=user.id,
+        user_agent=str(user_agent),
+        device_type=device_type
+    )
+    db.session.add(user_history)
+    db.session.commit()
+
+    return get_new_jwt_tokens(user)
+
+
+def add_new_user(email, password):
+    new_user = User(
+        email=email,
+        password=User.get_hashed_password(password),
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
+    return new_user
 
 
 @registry.handles(
@@ -49,12 +64,7 @@ def register():
     if user:
         raise errors.BadRequest(msg='A user with this email already exists')
 
-    new_user = User(
-        email=data['email'],
-        password=User.get_hashed_password(data['password']),
-    )
-    db.session.add(new_user)
-    db.session.commit()
+    add_new_user(data['email'], data['password'])
 
     return {'success': True}, HTTPStatus.OK
 
@@ -73,17 +83,7 @@ def login():
     if not user or not user.check_password(data['password']):
         raise errors.BadRequest('Wrong email or password')
 
-    response = get_new_jwt_tokens(user)
-
-    user_agent = parse(request.headers['User-Agent'])
-    device_type = get_device_type(user_agent)
-    user_history = LoginHistory(
-        user=user.id,
-        user_agent=str(user_agent),
-        device_type=device_type
-    )
-    db.session.add(user_history)
-    db.session.commit()
+    response = login_user(user, request.headers['User-Agent'])
 
     return response, HTTPStatus.OK
 

@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 
 import bcrypt
 from sqlalchemy import ForeignKey, UniqueConstraint
@@ -36,6 +37,28 @@ class User(db.Model):
     def get_token_payload(self):
         roles = [role.name for role in self.get_user_roles()]
         return {'user_id': self.id, 'roles': roles}
+
+    @classmethod
+    def get_user_by_social_account(
+            cls,
+            social_id: Optional[str] = None,
+            social_service: Optional[str] = None
+    ):
+        social_account = db.session.query(
+            SocialAccount
+        ).filter(
+            SocialAccount.social_user_id == social_id,
+            SocialAccount.social_service == social_service
+        ).first()
+
+        if social_account:
+            return db.session.query(
+                User
+            ).filter(
+                User.id == social_account.user_id
+            ).first()
+
+        return None
 
     def get_user_roles(self):
         return db.session.query(
@@ -128,3 +151,27 @@ class UserRole(db.Model):
         ForeignKey(Role.id, ondelete="CASCADE"),
         nullable=False
     )
+
+
+class SocialAccount(db.Model):
+    __tablename__ = 'social_account'
+    __table_args__ = (
+        db.UniqueConstraint(
+            'social_user_id', 'social_service', name='social_pk'
+        ),
+    )
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey('users.id', ondelete="CASCADE"),
+        nullable=False
+    )
+    user = db.relationship(
+        User,
+        backref=db.backref('social_accounts', lazy=True)
+    )
+    social_user_id = db.Column(db.Text, nullable=False)
+    social_service = db.Column(db.Text, nullable=False)
+
+    def __repr__(self):
+        return f'<SocialAccount {self.social_service}:{self.user_id}>'

@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2022-09-02 16:39:14.840870
+Create Date: 2022-09-02 18:29:27.390035
 
 """
 from alembic import op
@@ -55,11 +55,11 @@ def upgrade():
     op.create_table('social_account',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
-    sa.Column('social_id', sa.Text(), nullable=False),
-    sa.Column('social_name', sa.Text(), nullable=False),
+    sa.Column('social_user_id', sa.Text(), nullable=False),
+    sa.Column('social_service', sa.Text(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('social_id', 'social_name', name='social_pk')
+    sa.UniqueConstraint('social_user_id', 'social_service', name='social_pk')
     )
     op.create_table('user_role',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
