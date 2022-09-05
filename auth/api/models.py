@@ -47,7 +47,7 @@ class User(db.Model):
         social_account = db.session.query(
             SocialAccount
         ).filter(
-            SocialAccount.social_user_id == social_id,
+            SocialAccount.social_user_id == str(social_id),
             SocialAccount.social_service == social_service
         ).first()
 
