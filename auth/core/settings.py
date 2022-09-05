@@ -35,8 +35,13 @@ class JWTSettings(BaseSettings):
 
 
 class OAuthSettings(BaseSettings):
-    CLIENT_ID: str = Field(env='CLIENT_ID')
-    CLIENT_SECRET: str = Field(env='CLIENT_SECRET')
+    # YANDEX
+    YANDEX_CLIENT_ID: str = Field(env='YANDEX_CLIENT_ID')
+    YANDEX_CLIENT_SECRET: str = Field(env='YANDEX_CLIENT_SECRET')
+
+    # VK
+    VK_CLIENT_ID: str = Field(env='VK_CLIENT_ID')
+    VK_CLIENT_SECRET: str = Field(env='VK_CLIENT_SECRET')
 
 
 class AdditionalSettings(BaseSettings):

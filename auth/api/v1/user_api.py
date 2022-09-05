@@ -11,7 +11,7 @@ from api.models import User, LoginHistory
 from api.v1.schemas.user_api import (
     user_login_schema, user_profile_schema, login_history_schema
 )
-from api.v1.utils.other import get_device_type
+from api.v1.utils.other import get_device_type, generate_random_string
 from api.v1.utils.tokens import get_new_jwt_tokens, add_tokens_to_blocklist
 from databases import db
 from extensions import rebar
@@ -39,7 +39,10 @@ def login_user(user, user_agent):
     return get_new_jwt_tokens(user)
 
 
-def add_new_user(email, password):
+def add_new_user(email, password=None):
+    if not password:
+        password = generate_random_string()
+
     new_user = User(
         email=email,
         password=User.get_hashed_password(password),
