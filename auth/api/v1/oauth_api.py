@@ -29,6 +29,7 @@ def add_social_account(user_id, social_id, social_service):
     tags=[tag]
 )
 def yandex():
+    """User login via Yandex"""
     yandex_oauth = YandexOAuth()
 
     if code := request.args.get('code'):
@@ -53,6 +54,7 @@ def yandex():
     tags=[tag]
 )
 def vk():
+    """User login via VK"""
     vk_oauth = VKOAuth()
     redirect_uri = vk_oauth.service_data['redirect_uri']
 
