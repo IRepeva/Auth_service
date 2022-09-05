@@ -4,6 +4,7 @@ import requests
 
 from api.models import User
 from api.v1.user_api import add_new_user
+from api.v1.utils.other import generate_fake_email
 from core.settings import oauth_settings
 from databases import db
 
@@ -64,7 +65,11 @@ class BaseOauthService:
         if user:
             return user
 
-        user = db.session.query(User).filter(User.email == user_email).first()
+        if not user_email:
+            user_email = generate_fake_email()
+        else:
+            user = db.session.query(User).filter(User.email == user_email).first()
+
         if not user:
             user = add_new_user(user_email)
 

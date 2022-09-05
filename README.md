@@ -85,7 +85,7 @@ Access token is stored in 'Authorization' header and refresh token - in HttpOnly
 
 ### Swagger documentation
 More detailed information about service's endpoints is available 
-[here](http://0.0.0.0:80/swagger) after project start (`make run_app`)
+[here](http://0.0.0.0:80/swagger/ui) after project start (`make run_app`)
 
 
 **_Link to GitHub_**: `https://github.com/IRepeva/Auth_sprint_1`
