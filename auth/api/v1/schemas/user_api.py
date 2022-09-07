@@ -6,7 +6,7 @@ from extensions import ma
 
 
 class LoginHistorySchema(ma.SQLAlchemyAutoSchema):
-    date = fields.String()
+    login_date = fields.String()
 
     class Meta:
         model = LoginHistory

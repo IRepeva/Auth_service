@@ -11,7 +11,7 @@ from auth.conftest import (
 
 from api.models import Role, User, LoginHistory
 from api.v1.admin_api import URL_ROLE_PREFIX, URL_USERS_PREFIX
-from api.v1.utils.auth_decorators import SUPERUSER
+from utils.access_validation import SUPERUSER
 from databases import db
 
 URL_ADMIN_PROFILE = f'{URL_USERS_PREFIX}/{BASE_ID}'
@@ -606,7 +606,7 @@ def test_get_login_history(client, get_access_token):
     )
 
     # ok (superuser)
-    db_add(LoginHistory(user=BASE_ID, user_agent='007'))
+    db_add(LoginHistory(user=BASE_ID, user_agent='007', device_type='other'))
     access_token = get_access_token(SUPERUSER_ID)
     resp = check_ok(
         client, url, method,
@@ -615,8 +615,8 @@ def test_get_login_history(client, get_access_token):
     assert len(json.loads(resp.data)) == 1
 
     # ok (internal user)
-    db_add(LoginHistory(user=BASE_ID, user_agent='008'))
-    db_add(LoginHistory(user=BASE_ID, user_agent='009'))
+    db_add(LoginHistory(user=BASE_ID, user_agent='008', device_type='other'))
+    db_add(LoginHistory(user=BASE_ID, user_agent='009', device_type='other'))
 
     new_user = create_user_with_roles(roles='internal')
     access_token = get_access_token(new_user.id)

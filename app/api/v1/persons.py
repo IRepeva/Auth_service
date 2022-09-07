@@ -1,22 +1,26 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from api.v1.models.film import Film
 from api.v1.models.person import Person
 from api.v1.utils.errors import NotFoundDetail
 from services.films import FilmService, get_film_service
 from services.persons import PersonService, get_person_service
-from utils.cache import Cache
+from utils.cache import cache
+
+from api.v1.utils.auth_decorators import has_access, authorized
 
 router = APIRouter()
 
 
 @router.get('/search', response_model=List[Person],
             summary='Get search results')
-@Cache()
+@has_access('subscriber')
+@cache()
 async def persons_search(
+        request: Request,
         query: str | None = None,
         page: int | None = Query(default=1, alias='page[number]'),
         page_size: int | None = Query(default=50, alias='page[size]'),
@@ -49,8 +53,9 @@ async def persons_search(
 
 @router.get('/{person_id}/film', response_model=List[Film],
             summary="Get all person's films")
-@Cache()
+@cache()
 async def person_films(
+        request: Request,
         person_id: str,
         film_service: FilmService = Depends(get_film_service)
 ) -> List[Film]:
@@ -73,8 +78,10 @@ async def person_films(
 
 @router.get('/{person_id}', response_model=List[Person],
             summary="Get person by id")
-@Cache()
+@authorized
+@cache()
 async def person_details(
+        request: Request,
         person_id: str,
         person_service: PersonService = Depends(get_person_service)
 ) -> List[Person]:

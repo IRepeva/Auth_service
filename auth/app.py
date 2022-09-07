@@ -12,7 +12,7 @@ from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 sys.path.append('.')
 
 from commands import create_superuser
-from core.settings import BASE_CONFIG, additional_settings
+from core.settings import BASE_CONFIG, additional_settings, TEST_CONFIG
 from extensions import migrate, jwt, ma, bcrypt, rebar
 
 from databases import db, configure_db
@@ -30,7 +30,7 @@ resource = Resource(attributes={
 def configure_app(app):
     @app.before_request
     def before_request():
-        request_id = request.headers.get('X-Request-Id')
+        request_id = request.headers.get('X-Request-ID')
         if not request_id:
             raise RuntimeError('request id is required')
 
@@ -72,7 +72,8 @@ def create_app(config=BASE_CONFIG):
     app = Flask(__name__)
     app.config.from_object(config)
 
-    configure_app(app)
+    if config != TEST_CONFIG:
+        configure_app(app)
     configure_db(app)
     init_extensions(app)
     add_commands(app)

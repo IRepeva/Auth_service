@@ -3,11 +3,12 @@ import uuid
 from typing import Union
 
 import pytest
-from flask_jwt_extended import create_access_token, get_jti, \
-    create_refresh_token
+from flask_jwt_extended import (
+    create_access_token, get_jti, create_refresh_token
+)
 
 from api.models import User, Role, UserRole
-from api.v1.utils.auth_decorators import SUPERUSER
+from utils.access_validation import SUPERUSER
 from auth.app import create_app
 from core.settings import TEST_CONFIG
 from databases import db, cache
@@ -45,6 +46,13 @@ def tear_down_dbs():
     db.session.commit()
 
 
+def create_partitions():
+    db.session.execute(
+        "CREATE TABLE IF NOT EXISTS login_history_other "
+        "PARTITION OF login_history FOR VALUES IN ('other');"
+    )
+
+
 @pytest.fixture(scope='session', autouse=True)
 def app():
     """
@@ -53,6 +61,7 @@ def app():
     app = create_app(TEST_CONFIG)
     with app.app_context():
         db.create_all()
+        create_partitions()
         yield app
 
         db.drop_all()
@@ -140,6 +149,9 @@ def create_user_with_roles(
         password: str = SOME_PASSWORD,
         roles: Union[tuple, set, list, str] = None
 ):
+    """
+    Create user with specific roles
+    """
     logger.info(f'Creating user with roles: {roles}')
 
     hash_password = User.get_hashed_password(password)

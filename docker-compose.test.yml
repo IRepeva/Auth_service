@@ -15,6 +15,10 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXP_ACCESS: ${JWT_EXP_ACCESS}
       JWT_EXP_REFRESH: ${JWT_EXP_REFRESH}
+      YANDEX_CLIENT_ID: ${YANDEX_CLIENT_ID}
+      YANDEX_CLIENT_SECRET: ${YANDEX_CLIENT_SECRET}
+      VK_CLIENT_ID: ${VK_CLIENT_ID}
+      VK_CLIENT_SECRET: ${VK_CLIENT_SECRET}
     entrypoint: >
       sh -c "python3 -m pytest api/v1 -vv"
     depends_on:

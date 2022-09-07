@@ -14,6 +14,7 @@ COPY --chown=auth_user:auth_group ./requirements requirements
 RUN pip install -r requirements/auth.txt --no-cache-dir
 
 COPY --chown=auth_user:auth_group auth .
+COPY --chown=auth_user:auth_group utils ./utils
 
 CMD ["gunicorn", "--worker-class", "gevent", "-w", "10", "--bind", "0.0.0.0:5000", "wsgi_app:app"]
 
