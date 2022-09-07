@@ -4,7 +4,7 @@ import click
 
 sys.path.append('.')
 from api.models import User, Role, UserRole
-from api.v1.utils.auth_decorators import SUPERUSER
+from utils.access_validation import SUPERUSER
 from databases import db
 
 

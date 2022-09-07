@@ -2,20 +2,23 @@ import sys
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 sys.path.append('.')
 from api.v1.models.film import FilmDetails, Film
 from api.v1.utils.errors import NotFoundDetail
+from api.v1.utils.auth_decorators import has_access, authorized
 from services.films import FilmService, get_film_service
-from utils.cache import Cache
+from utils.cache import cache
 
 router = APIRouter()
 
 
 @router.get('/search', response_model=List[Film], summary='Get search results')
-@Cache()
+@has_access('subscriber')
+@cache()
 async def films_search(
+        request: Request,
         sort: str | None = None,
         query: str | None = None,
         page: int | None = Query(default=1, alias='page[number]'),
@@ -46,8 +49,10 @@ async def films_search(
 
 
 @router.get('/{film_id}', response_model=FilmDetails, summary="Get film by id")
-@Cache()
+@authorized
+@cache()
 async def film_details(
+        request: Request,
         film_id: str,
         film_service: FilmService = Depends(get_film_service)
 ) -> FilmDetails:
@@ -73,8 +78,9 @@ async def film_details(
 
 
 @router.get('/', response_model=List[Film], summary='Get all movies')
-@Cache()
+@cache()
 async def films(
+        request: Request,
         sort: str | None = None,
         similar_to: str | None = None,
         genre: str | None = Query(default=None, alias='filter[genre]'),

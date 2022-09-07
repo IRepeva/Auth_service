@@ -1,19 +1,22 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from api.v1.models.genre import Genre
 from api.v1.utils.errors import NotFoundDetail
 from services.genres import GenreService, get_genre_service
-from utils.cache import Cache
+from utils.cache import cache
+
+from api.v1.utils.auth_decorators import authorized
 
 router = APIRouter()
 
 
 @router.get('/', response_model=List[Genre], summary='Get all genres')
-@Cache()
+@cache()
 async def genres_list(
+        request: Request,
         genre_service: GenreService = Depends(get_genre_service)
 ) -> List[Genre]:
     """
@@ -32,8 +35,10 @@ async def genres_list(
 
 
 @router.get('/{genre_id}', response_model=Genre, summary="Get genre by id")
-@Cache()
+@authorized
+@cache()
 async def genre_by_id(
+        request: Request,
         genre_id: str,
         genre_service: GenreService = Depends(get_genre_service)
 ) -> Genre:

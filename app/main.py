@@ -5,15 +5,15 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from api.v1 import films, genres, persons
-from utils.wait_for_es import check_es_connection
-from utils.wait_for_redis import check_redis_connection
 from core.config import settings
 from core.logger import LOGGING
 from db import elastic, redis
+from utils.wait_for_es import check_es_connection
+from utils.wait_for_redis import check_redis_connection
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    docs_url='/api/openapi',
+    docs_url='/api/swagger',
     openapi_url='/api/openapi.json',
     default_response_class=ORJSONResponse,
 )

@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # REDIS
     REDIS_URL: str = Field('redis://127.0.0.1:6379', env='REDIS_URL')
 
+    # JWT
+    JWT_SECRET_KEY: str = Field(env='JWT_SECRET_KEY')
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -73,7 +73,7 @@ Pagination and cache are implemented for a better user experience
 
 ### Swagger documentation
 More detailed information about service's endpoints is available 
-[here](http://0.0.0.0:80/api/openapi) after project start (`make run_app`)
+[here](http://0.0.0.0:80/api/swagger) after project start (`make run_app`)
 
 
 ## Authentication service

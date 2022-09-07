@@ -105,9 +105,9 @@ def test_get_login_history(client, get_access_token):
     )
 
     # ok
-    db_add(LoginHistory(user=BASE_ID, user_agent='007'))
-    db_add(LoginHistory(user=BASE_ID, user_agent='008'))
-    db_add(LoginHistory(user=BASE_ID, user_agent='009'))
+    db_add(LoginHistory(user=BASE_ID, user_agent='007', device_type='other'))
+    db_add(LoginHistory(user=BASE_ID, user_agent='008', device_type='other'))
+    db_add(LoginHistory(user=BASE_ID, user_agent='009', device_type='other'))
     access_token = get_access_token()
     headers = {'Authorization': 'Bearer ' + access_token}
     resp = check_ok(client, url, method, headers=headers)

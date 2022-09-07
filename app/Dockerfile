@@ -14,5 +14,6 @@ COPY --chown=app_user:app_group ./requirements requirements
 RUN pip install -r requirements/app.txt --no-cache-dir
 
 COPY --chown=app_user:app_group ./app .
+COPY --chown=app_user:app_group utils ./utils
 
 CMD ["gunicorn", "main:app", "-w", "10", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
