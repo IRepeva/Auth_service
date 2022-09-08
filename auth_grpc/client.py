@@ -27,11 +27,11 @@ class AuthClient(object):
         Client function to call the rpc for GetServerResponse
         """
         print(message)
-        mess = pb2.Message(message=message)
+        mess = pb2.Message(token=message, roles=['1', '2'])
         # mess = pb2.Token(token='message')
         print(f'OOOOOOOOOOOOOOOOOOOOOOO {mess}')
-        return self.stub.GetServerResponse(mess)
-        # return self.stub.HasAccess(mess)
+        # return self.stub.GetServerResponse(mess)
+        return self.stub.HasAccess(mess)
 
 
 if __name__ == '__main__':
