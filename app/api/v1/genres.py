@@ -8,12 +8,14 @@ from api.v1.utils.errors import NotFoundDetail
 from services.genres import GenreService, get_genre_service
 from utils.cache import cache
 
-from api.v1.utils.auth_decorators import authorized
+from api.v1.utils.authentication import authorized, strict_verification
+
 
 router = APIRouter()
 
 
 @router.get('/', response_model=List[Genre], summary='Get all genres')
+@strict_verification()
 @cache()
 async def genres_list(
         request: Request,

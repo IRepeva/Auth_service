@@ -47,3 +47,8 @@ run_sample_app:
 down:
 	@docker-compose down --remove-orphans
 	@echo "Applications are down"
+
+compile_proto:
+	@echo "Compilation started"
+	@docker-compose exec grpc python -m grpc_tools.protoc --proto_path=. ./auth_grpc.proto --python_out=. --grpc_python_out=.
+	@echo "Compilation finished"

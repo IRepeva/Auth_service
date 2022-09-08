@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     # JWT
     JWT_SECRET_KEY: str = Field(env='JWT_SECRET_KEY')
 
+    # gRPC
+    GRPC_HOST: str = Field('localhost', env='GRPC_HOST')
+    GRPC_PORT: int = Field(50051, env='GRPC_PORT')
+
 
 @lru_cache
 def get_settings() -> Settings:

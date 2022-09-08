@@ -38,6 +38,8 @@ services:
       REDIS_URL: ${REDIS_URL}
       ES_URL: ${ES_URL}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      GRPC_HOST: ${GRPC_HOST}
+      GRPC_PORT: ${GRPC_PORT}
     depends_on:
       - elasticsearch
       - redis
@@ -86,3 +88,11 @@ services:
     ports:
       - '6831:6831/udp'
       - '16686:16686'
+
+  grpc:
+    container_name: grpc
+    build:
+      context: .
+      dockerfile: auth_grpc/Dockerfile
+    ports:
+      - '50051'

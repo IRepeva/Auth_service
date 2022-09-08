@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package grpc_server;
+
+service Unary{
+  // A simple RPC.
+  //
+  // Obtains the MessageResponse at a given position.
+ rpc HasAccess(Token) returns (HasAccessResponse) {}
+
+}
+
+message Token{
+ string token = 1;
+ repeated string roles = 2;
+}
+
+message HasAccessResponse{
+ bool has_access = 1;
+}

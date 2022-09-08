@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 sys.path.append('.')
 from api.v1.models.film import FilmDetails, Film
 from api.v1.utils.errors import NotFoundDetail
-from api.v1.utils.auth_decorators import has_access, authorized
+from api.v1.utils.authentication import has_access, authorized
 from services.films import FilmService, get_film_service
 from utils.cache import cache
 
