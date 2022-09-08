@@ -13,12 +13,12 @@ class UnaryService(pb2_grpc.UnaryServicer):
     def __init__(self, *args, **kwargs):
         pass
 
-    def GetServerResponse(self, request, context):
+    def HasAccess(self, request, context):
 
         # get the string from the incoming request
-        message = request.message
-        print(f'server: {request.message}')
-        if token := request.message:
+        message = request.token
+        print(f'server: {request.token}, {request.roles}')
+        if token := request.token:
             key = 'PupsSecret'
             try:
                 # print(dir(jwt))
@@ -29,9 +29,9 @@ class UnaryService(pb2_grpc.UnaryServicer):
                 print(f'NOT PAY! {e}')
                 returned = 'NO RESULT'
         result = json.dumps(returned)
-        result = {'message': result, 'received': True}
+        result = {'has_access': True}
 
-        return pb2.MessageResponse(**result)
+        return pb2.HasAccessResponse(**result)
 
 
 def serve():

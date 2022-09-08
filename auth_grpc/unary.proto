@@ -1,20 +1,20 @@
 syntax = "proto3";
 
-package unary;
+package auth;
 
 service Unary{
   // A simple RPC.
   //
   // Obtains the MessageResponse at a given position.
- rpc GetServerResponse(Message) returns (MessageResponse) {}
+ rpc HasAccess(Message) returns (HasAccessResponse) {}
 
 }
 
 message Message{
- string message = 1;
+ string token = 1;
+ repeated string roles = 2;
 }
 
-message MessageResponse{
- string message = 1;
- bool received = 2;
+message HasAccessResponse{
+ bool has_access = 1;
 }
