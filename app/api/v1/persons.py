@@ -10,7 +10,7 @@ from services.films import FilmService, get_film_service
 from services.persons import PersonService, get_person_service
 from utils.cache import cache
 
-from api.v1.utils.auth_decorators import has_access, authorized
+from api.v1.utils.authentication import has_access, authorized
 
 router = APIRouter()
 

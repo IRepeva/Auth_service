@@ -10,3 +10,5 @@ elasticsearch_dsl==7.4.0
 asynctest==0.13.0
 redis==4.3.4
 pyjwt==2.4.0
+grpcio==1.48.1
+grpcio-tools==1.48.1
