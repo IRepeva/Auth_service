@@ -30,6 +30,8 @@ SOME_ID = uuid.uuid4()
 SOME_EMAIL = 'girl@has_no.name'
 SOME_PASSWORD = 'GirlIsNoOne'
 
+SOCIAL_ID = 'Bruce Lee'
+
 MODELS = [
     cls for cls in db.Model.registry._class_registry.values()
     if isinstance(cls, type) and issubclass(cls, db.Model)

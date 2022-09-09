@@ -39,7 +39,7 @@ def yandex():
         user_social_id, user_email = (
             user_info.get('id'), user_info['default_email']
         )
-        user = yandex_oauth.get_user(user_social_id, user_email.lower())
+        user = yandex_oauth.get_user(user_social_id, user_email)
 
         app_tokens = login_user(user, request.headers['User-Agent'])
         return app_tokens, HTTPStatus.OK
@@ -64,7 +64,7 @@ def vk():
         user_social_id, user_email = (
             user_info.get('user_id'), user_info.get('email')
         )
-        user = vk_oauth.get_user(user_social_id, user_email.lower())
+        user = vk_oauth.get_user(user_social_id, user_email)
 
         app_tokens = login_user(user, request.headers['User-Agent'])
         return app_tokens, HTTPStatus.OK

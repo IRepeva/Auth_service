@@ -31,7 +31,7 @@ class BaseOauthService:
     @property
     def service_data(self):
         return OAUTH_DATA[self.SERVICE_NAME]
-    
+
     def make_authorize_url(self, **kwargs):
         base_auth_url = self.service_data['authorization_endpoint'] + '?'
         params = {'client_id': self.CLIENT_ID, 'response_type': 'code'}
@@ -68,6 +68,7 @@ class BaseOauthService:
         if not user_email:
             user_email = generate_fake_email()
         else:
+            user_email = user_email.lower()
             user = db.session.query(User).filter(User.email == user_email).first()
 
         if not user:
