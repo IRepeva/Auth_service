@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package grpc_server;
+
+service Auth{
+  // A simple RPC.
+  //
+  // Obtains the MessageResponse at a given position.
+ rpc HasAccess(Message) returns (HasAccessResponse) {}
+
+}
+
+message Message{
+ string token = 1;
+ repeated string roles = 2;
+}
+
+message HasAccessResponse{
+ string message = 1;
+ bool has_access = 2;
+}
