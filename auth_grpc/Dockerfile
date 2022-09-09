@@ -10,5 +10,6 @@ COPY ./requirements requirements
 RUN pip install -r requirements/grpc.txt --no-cache-dir
 
 COPY auth_grpc .
+COPY utils ./utils
 
-CMD ["python3", "unary_server.py"]
+CMD ["python3", "auth_server.py"]

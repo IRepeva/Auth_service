@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get('/', response_model=List[Genre], summary='Get all genres')
-@strict_verification()
+@authorized
 @cache()
 async def genres_list(
         request: Request,
@@ -37,7 +37,7 @@ async def genres_list(
 
 
 @router.get('/{genre_id}', response_model=Genre, summary="Get genre by id")
-@authorized
+@strict_verification('admin')
 @cache()
 async def genre_by_id(
         request: Request,

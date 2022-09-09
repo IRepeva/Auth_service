@@ -1,4 +1,50 @@
+import jwt
+
 SUPERUSER = 'superuser'
+
+
+def get_blocklist_key(jti: str, user_id: str) -> str:
+    return user_id + ':' + jti
+
+
+def is_access_token_in_blocklist(jwt_payload, cache):
+    access_jti = jwt_payload['jti']
+    user_id = jwt_payload['sub']['user_id']
+
+    cache_key = get_blocklist_key(access_jti, user_id)
+    return cache.get(cache_key)
+
+
+def get_token_from_request(**kwargs):
+    if request := kwargs.get('request'):
+        if token := request.headers.get('Authorization'):
+            try:
+                return True, token.split(' ')[1]
+            except IndexError:
+                return False, 'Wrong token format'
+        return False, 'No access token in Headers'
+    return False, 'No request object provided for the endpoint'
+
+
+def is_authorized(secret_key, cache, **kwargs):
+    status, response = get_token_from_request(**kwargs)
+    if status:
+        return is_token_valid(response, secret_key, cache)
+
+    return False, response
+
+
+def is_token_valid(token, secret_key, cache):
+    try:
+        print(f'TOKEN: {token}, class: {type(token)}')
+        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+    except Exception as e:
+        return False, str(e)
+
+    if is_access_token_in_blocklist(payload, cache):
+        return False, 'Token is in the blocklist'
+
+    return True, payload
 
 
 def check_or(or_roles, user_roles):

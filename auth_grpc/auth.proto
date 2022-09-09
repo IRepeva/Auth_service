@@ -2,19 +2,20 @@ syntax = "proto3";
 
 package grpc_server;
 
-service Unary{
+service Auth{
   // A simple RPC.
   //
   // Obtains the MessageResponse at a given position.
- rpc HasAccess(Token) returns (HasAccessResponse) {}
+ rpc HasAccess(Message) returns (HasAccessResponse) {}
 
 }
 
-message Token{
+message Message{
  string token = 1;
  repeated string roles = 2;
 }
 
 message HasAccessResponse{
- bool has_access = 1;
+ string message = 1;
+ bool has_access = 2;
 }

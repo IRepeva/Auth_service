@@ -5,7 +5,7 @@ import grpc
 import auth_pb2 as auth__pb2
 
 
-class UnaryStub(object):
+class AuthStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,13 +15,13 @@ class UnaryStub(object):
             channel: A grpc.Channel.
         """
         self.HasAccess = channel.unary_unary(
-                '/grpc_server.Unary/HasAccess',
-                request_serializer=auth__pb2.Token.SerializeToString,
+                '/grpc_server.Auth/HasAccess',
+                request_serializer=auth__pb2.Message.SerializeToString,
                 response_deserializer=auth__pb2.HasAccessResponse.FromString,
                 )
 
 
-class UnaryServicer(object):
+class AuthServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def HasAccess(self, request, context):
@@ -34,21 +34,21 @@ class UnaryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_UnaryServicer_to_server(servicer, server):
+def add_AuthServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'HasAccess': grpc.unary_unary_rpc_method_handler(
                     servicer.HasAccess,
-                    request_deserializer=auth__pb2.Token.FromString,
+                    request_deserializer=auth__pb2.Message.FromString,
                     response_serializer=auth__pb2.HasAccessResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'grpc_server.Unary', rpc_method_handlers)
+            'grpc_server.Auth', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class Unary(object):
+class Auth(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -62,8 +62,8 @@ class Unary(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/grpc_server.Unary/HasAccess',
-            auth__pb2.Token.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/grpc_server.Auth/HasAccess',
+            auth__pb2.Message.SerializeToString,
             auth__pb2.HasAccessResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -94,5 +94,11 @@ services:
     build:
       context: .
       dockerfile: auth_grpc/Dockerfile
+    environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      GRPC_PORT: ${GRPC_PORT}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      POSTGRES_URL: ${POSTGRES_URL}
     ports:
       - '50051'
