@@ -38,12 +38,12 @@ def rate_limit(limit=20):
 
             current_minute_key = f'limit:{request.remote_addr}:{now_minute}'
             current_count = cache.get(current_minute_key)
-            if current_count and int(current_count) > limit:
+            if current_count and int(current_count) >= limit:
                 raise errors.TooManyRequests()
 
             pipe = cache.pipeline()
-            pipe.incr(current_count, 1)
-            pipe.expire(current_count, 60)
+            pipe.incr(current_minute_key, 1)
+            pipe.expire(current_minute_key, 60)
             pipe.execute()
 
             return func(*args, **kwargs)

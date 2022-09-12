@@ -5,21 +5,15 @@ import core
 from api.models import SocialAccount, User
 from api.v1.oauth_api import OAUTH_PREFIX
 from auth.conftest import BASE_EMAIL, SOCIAL_ID, db_add, BASE_ID, SOME_EMAIL
-from core.oauth import BaseOauthService
+from core.oauth import BaseOauthProvider, YandexOAuth
 from core.settings import oauth_settings
 from databases import db
-
-from auth.core.oauth import YandexOAuth
 
 URL_OAUTH = f'{OAUTH_PREFIX}'
 
 
-def generate_fake_fake_email():
-    return 'fake.fake'
-
-
 @dataclass
-class FakeOAuth(BaseOauthService):
+class FakeOAuth(BaseOauthProvider):
     SERVICE_NAME: str
     CLIENT_ID: str
 
@@ -47,8 +41,9 @@ def test_yandex(client):
     assert resp.status_code == 302
     assert resp.headers['Location'] == yandex_provider.make_authorize_url()
 
-    core.oauth.BaseOauthService.get_oauth_data = FakeOAuth.get_oauth_tokens
+    core.oauth.BaseOauthProvider.get_oauth_data = FakeOAuth.get_oauth_tokens
     core.oauth.YandexOAuth.get_user_info = FakeOAuth.get_yandex_user_data
+
     resp = client.get(url + '?code=666')
     assert resp.status_code == HTTPStatus.OK
     assert 'access_token' in resp.data.decode()
@@ -73,11 +68,11 @@ def test_vk(client):
     resp = client.get(url)
     assert resp.status_code == 302
     assert resp.headers['Location'] == vk_provider.make_authorize_url(
-        redirect_uri=vk_provider.service_data['redirect_uri'],
+        redirect_uri=vk_provider.provider_data['redirect_uri'],
         scope='email'
     )
 
-    core.oauth.BaseOauthService.get_oauth_data = FakeOAuth.get_vk_user_data
+    core.oauth.BaseOauthProvider.get_oauth_data = FakeOAuth.get_vk_user_data
     resp = client.get(url + '?code=666')
     assert resp.status_code == HTTPStatus.OK
     assert 'access_token' in resp.data.decode()
@@ -93,7 +88,7 @@ def test_vk(client):
 
 def test_get_social_user(mocker):
     base_service_inst = YandexOAuth()
-    mock_add_social_acc = mocker.patch('api.v1.oauth_api.add_social_account')
+    mock_add_social_acc = mocker.patch('core.oauth.add_social_account')
     present_social_data = {
                 'user_id': BASE_ID,
                 'social_user_id': SOCIAL_ID,
@@ -105,8 +100,9 @@ def test_get_social_user(mocker):
     mock_add_social_acc.assert_not_called()
 
 
-def test_get_db_user():
+def test_get_db_user(mocker):
     base_service_inst = YandexOAuth()
+    mock_add_social_acc = mocker.patch('core.oauth.add_social_account')
 
     user = db.session.query(
         User
@@ -117,47 +113,36 @@ def test_get_db_user():
 
     base_service_inst.get_user(SOCIAL_ID, BASE_EMAIL)
 
-    social_account = db.session.query(
-        SocialAccount
-    ).filter(
-        SocialAccount.user_id == BASE_ID
-    ).first()
-    assert social_account is not None
+    mock_add_social_acc.assert_called_with(BASE_ID, SOCIAL_ID, 'yandex')
 
 
-def test_new_user_no_email():
+def test_new_user_no_email(mocker):
     base_service_inst = YandexOAuth()
+
+    mock_gen_fake_email = mocker.patch('core.oauth.generate_fake_email')
+    mock_gen_fake_email.return_value = 'fake.fake'
+    mock_add_new_user = mocker.patch('core.oauth.add_new_user')
+    mock_add_social_acc = mocker.patch('core.oauth.add_social_account')
+
     base_service_inst.get_user(SOCIAL_ID)
 
-    user = db.session.query(
-        User
-    ).filter(
-        User.email.ilike('%fake.fake%')
-    ).first()
-    assert user is not None
-
-    social_account = db.session.query(
-        SocialAccount
-    ).filter(
-        SocialAccount.user_id == user.id
-    ).first()
-    assert social_account is not None
+    mock_gen_fake_email.assert_called_once()
+    mock_add_new_user.assert_called_with('fake.fake')
+    mock_add_social_acc.assert_called_with(
+        mock_add_new_user().id, SOCIAL_ID, 'yandex'
+    )
 
 
-def test_new_user_email():
+def test_new_user_email(mocker):
     base_service_inst = YandexOAuth()
+    mock_gen_fake_email = mocker.patch('core.oauth.generate_fake_email')
+    mock_add_new_user = mocker.patch('core.oauth.add_new_user')
+    mock_add_social_acc = mocker.patch('core.oauth.add_social_account')
+
     base_service_inst.get_user(SOCIAL_ID, SOME_EMAIL)
 
-    user = db.session.query(
-        User
-    ).filter(
-        User.email == SOME_EMAIL
-    ).first()
-    assert user is not None
-
-    social_account = db.session.query(
-        SocialAccount
-    ).filter(
-        SocialAccount.user_id == user.id
-    ).first()
-    assert social_account is not None
+    mock_gen_fake_email.assert_not_called()
+    mock_add_new_user.assert_called_with(SOME_EMAIL)
+    mock_add_social_acc.assert_called_with(
+        mock_add_new_user().id, SOCIAL_ID, 'yandex'
+    )

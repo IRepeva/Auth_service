@@ -1,20 +1,20 @@
 from http import HTTPStatus
 
+from api.models import User, LoginHistory
+from api.v1.schemas.user_api import (
+    user_login_schema, user_profile_schema, login_history_schema
+)
+from api.v1.utils.other import get_device_type, generate_random_string
+from api.v1.utils.other import rate_limit
+from api.v1.utils.tokens import get_new_jwt_tokens, add_tokens_to_blocklist
+from databases import db
+from extensions import rebar
 from flask import request, jsonify, Blueprint, redirect
 from flask_jwt_extended import (
     get_jwt_identity, jwt_required, get_jwt, unset_refresh_cookies
 )
 from flask_rebar import errors
 from user_agents import parse
-
-from api.models import User, LoginHistory
-from api.v1.schemas.user_api import (
-    user_login_schema, user_profile_schema, login_history_schema
-)
-from api.v1.utils.other import get_device_type, generate_random_string
-from api.v1.utils.tokens import get_new_jwt_tokens, add_tokens_to_blocklist
-from databases import db
-from extensions import rebar
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
 registry = rebar.create_handler_registry()
@@ -59,6 +59,7 @@ def add_new_user(email, password=None):
     tags=[tag],
     request_body_schema=user_login_schema
 )
+@rate_limit()
 def register():
     """User registration"""
     data = user_login_schema.load(request.get_json())
@@ -78,6 +79,7 @@ def register():
     tags=[tag],
     request_body_schema=user_login_schema,
 )
+@rate_limit(30)
 def login():
     """User login"""
     data = user_login_schema.load(request.get_json())

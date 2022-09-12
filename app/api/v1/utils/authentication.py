@@ -1,19 +1,16 @@
-import sys
 from functools import wraps
 from http import HTTPStatus
 
-from fastapi import HTTPException
-from utils.wait_for_redis import redis
-
-sys.path.extend(['/app/auth_grpc', '.'])
-from core.config import settings
-from auth_grpc import auth_pb2_grpc as pb2_grpc
-from auth_grpc import auth_pb2 as pb2
-from utils.access_validation import (
-    is_allowed, is_authorized, get_token_from_request
-)
-
 import grpc
+from core.config import settings
+from db.redis import get_redis
+from fastapi import HTTPException
+
+import utils.grpc.auth_pb2 as pb2
+import utils.grpc.auth_pb2_grpc as pb2_grpc
+from utils.access_validation import (
+    is_allowed, async_is_authorized, get_token_from_request
+)
 
 
 class AuthClient(object):
@@ -43,9 +40,9 @@ grpc_client = AuthClient(
 def authorized(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
-        user_authorized, _ = is_authorized(
+        user_authorized, _ = await async_is_authorized(
             secret_key=settings.JWT_SECRET_KEY,
-            cache=redis, **kwargs
+            cache=await get_redis(), **kwargs
         )
         if user_authorized:
             return await func(*args, **kwargs)
@@ -62,9 +59,9 @@ def has_access(*roles, or_=None, and_=None):
     def wrapper(func):
         @wraps(func)
         async def decorator(*args, **kwargs):
-            user_authorized, resp = is_authorized(
+            user_authorized, resp = await async_is_authorized(
                 secret_key=settings.JWT_SECRET_KEY,
-                cache=redis, **kwargs
+                cache=await get_redis(), **kwargs
             )
             if user_authorized:
                 user_roles = resp['sub']['roles']
