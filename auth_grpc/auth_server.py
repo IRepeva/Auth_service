@@ -2,8 +2,7 @@ from concurrent import futures
 
 import grpc
 
-import auth_pb2 as pb2
-import auth_pb2_grpc as pb2_grpc
+from utils.grpc import auth_pb2 as pb2, auth_pb2_grpc as pb2_grpc
 from app.app import app
 from app.databases import db, cache
 from app.models import User

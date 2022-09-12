@@ -78,7 +78,8 @@ def create_app(config=BASE_CONFIG):
     init_extensions(app)
     add_commands(app)
     register_blueprints(app)
-    configure_tracer(app)
+    if app.config.get('JAEGER_TRACE', True):
+        configure_tracer(app)
 
     return app
 

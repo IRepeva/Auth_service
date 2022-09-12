@@ -69,6 +69,9 @@ class TestSettings(BaseSettings):
     JWT_COOKIE_CSRF_PROTECT = False
     JWT_TOKEN_LOCATION = ['headers', 'cookies']
 
+    # GENERAL
+    JAEGER_TRACE: bool = Field(False, env='JAEGER_TRACE')
+
 
 @lru_cache
 def get_db_settings() -> DBSettings:

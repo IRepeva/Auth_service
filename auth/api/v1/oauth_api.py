@@ -1,10 +1,9 @@
 from http import HTTPStatus
 
-from flask import request, Blueprint, redirect, jsonify
-
 from api.models import SocialAccount
 from api.v1.user_api import registry, login_user
 from databases import db
+from flask import request, Blueprint, redirect, jsonify
 
 oauth_blueprint = Blueprint('oauth', __name__, url_prefix='/oauth')
 

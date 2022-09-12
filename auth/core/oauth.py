@@ -131,5 +131,10 @@ class VKOAuth(BaseOauthProvider):
             scope='email'
         )
 
+    def make_token_endpoint_data(self, code, **kwargs):
+        return super(VKOAuth, self).make_token_endpoint_data(
+            code, redirect_uri=self.provider_data['redirect_uri']
+        )
+
     def get_user_data(self, user_info):
         return user_info.get('user_id'), user_info.get('email')
