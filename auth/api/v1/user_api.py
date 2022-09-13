@@ -4,12 +4,14 @@ from api.models import User, LoginHistory
 from api.v1.schemas.user_api import (
     user_login_schema, user_profile_schema, login_history_schema
 )
+from api.v1.utils.captcha import create_captcha, CAPTCHA_KEY
 from api.v1.utils.other import get_device_type, generate_random_string
 from api.v1.utils.other import rate_limit
 from api.v1.utils.tokens import get_new_jwt_tokens, add_tokens_to_blocklist
+from databases import cache
 from databases import db
 from extensions import rebar
-from flask import request, jsonify, Blueprint, redirect
+from flask import request, jsonify, Blueprint, redirect, url_for
 from flask_jwt_extended import (
     get_jwt_identity, jwt_required, get_jwt, unset_refresh_cookies
 )
@@ -209,3 +211,37 @@ def user_get_login_history():
     ).items
 
     return login_history_schema.dump(login_history)
+
+
+@registry.handles(
+    rule=f'/captcha',
+    method='GET',
+    tags=['capture'],
+)
+def captcha_get():
+    """Get captcha"""
+    random_number = create_captcha()
+    cache.set(CAPTCHA_KEY, random_number)
+    return '''
+        <form method="POST">
+        <img src="./static/captcha.png"><br><br>
+        <input type="text" name="number"><br><br>
+        <button type="submit">submit</button>
+    '''
+
+
+@registry.handles(
+    rule=f'/captcha',
+    method='POST',
+    tags=['capture'],
+)
+def captcha_post():
+    """Verify captcha"""
+    number = request.form['number']
+    captcha_num = cache.get(CAPTCHA_KEY).decode()
+    try:
+        if number == captcha_num:
+            return jsonify({'msg': 'success'}), HTTPStatus.OK
+        return redirect(url_for('captcha_get'))
+    except Exception as e:
+        return redirect(url_for('captcha_get'))

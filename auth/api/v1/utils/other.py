@@ -26,6 +26,10 @@ def generate_random_string(char_num=16):
     return ''.join(secrets_choice(alphabet) for _ in range(char_num))
 
 
+def generate_random_number_string(char_num=6):
+    return ''.join(secrets_choice(string.digits) for _ in range(char_num))
+
+
 def generate_fake_email():
     return generate_random_string(8) + '@fake.fake'
 

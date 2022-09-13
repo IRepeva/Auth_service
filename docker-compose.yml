@@ -22,6 +22,7 @@ services:
       VK_CLIENT_ID: ${VK_CLIENT_ID}
       VK_CLIENT_SECRET: ${VK_CLIENT_SECRET}
     volumes:
+      - ./auth/static:/auth/static
       - ./auth/migrations:/auth/migrations
     depends_on:
       - redis
@@ -74,6 +75,7 @@ services:
     image: nginx:1.21.6
     container_name: nginx
     volumes:
+      - ./auth/static:/auth/static
       - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./deploy/nginx/configs:/etc/nginx/conf.d:ro
     ports:
