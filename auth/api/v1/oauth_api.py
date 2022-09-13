@@ -37,7 +37,7 @@ def oauth_authorize(provider):
         user_social_id, user_email = oauth_provider.get_user_data(oauth_data)
         if user_social_id is None:
             return (
-                jsonify({"msg": f"Authentication failed"}),
+                jsonify({"msg": "Authentication failed"}),
                 HTTPStatus.UNAUTHORIZED
             )
 

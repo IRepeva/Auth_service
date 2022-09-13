@@ -24,7 +24,7 @@ OAUTH_DATA = {
 }
 
 
-class BaseOauthProvider:
+class BaseOauthProvider(abc.ABC):
     SERVICE_NAME = None
     CLIENT_ID = None
     CLIENT_SECRET = None
@@ -69,7 +69,7 @@ class BaseOauthProvider:
 
     @abc.abstractmethod
     def get_user_data(self, user_info):
-        raise NotImplementedError('Method not implemented!')
+        pass
 
     def get_user(self, user_social_id, user_email=None):
         user = User.get_user_by_social_account(
